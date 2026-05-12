@@ -4,6 +4,7 @@ import { ContentCard } from '../components/home/ContentCard';
 import { MovieSearch } from '../components/home/MovieSearch';
 import { contentCatalog } from '../data/content';
 import { useNavigate } from 'react-router-dom';
+import { AiAssistant } from '../components/dashboard/AiAssistant';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +36,9 @@ export const HomePage: React.FC = () => {
           ))}
         </div>
       </section>
+
+      {/* AI Assistant - SyncBot */}
+      <AiAssistant />
     </div>
   );
 };
