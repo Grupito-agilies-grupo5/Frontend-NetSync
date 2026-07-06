@@ -38,11 +38,16 @@ export const RoomPage: React.FC = () => {
   useEffect(() => {
     if (!roomId) return;
 
+    // Re-join on every (re)connect, not just the first time — otherwise a
+    // dropped connection leaves this user out of the Socket.IO room forever:
+    // no more chat messages in/out and missing from the user list.
+    const rejoin = () => joinRoom(roomId, userName, isHost);
+
     const init = async () => {
       try {
         const roomData = await api.getRoom(roomId);
         setRoom(roomData);
-        joinRoom(roomId, userName, isHost);
+        rejoin();
       } catch (err) {
         console.error('Failed to load room:', err);
         navigate('/');
@@ -52,8 +57,10 @@ export const RoomPage: React.FC = () => {
     };
 
     init();
+    socket.on('connect', rejoin);
 
     return () => {
+      socket.off('connect', rejoin);
       disconnectSocket();
     };
   }, [roomId]);
