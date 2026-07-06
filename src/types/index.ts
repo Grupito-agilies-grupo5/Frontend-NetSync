@@ -15,6 +15,7 @@ export interface Room {
   createdAt: string;
   endedAt?: string;
   users?: RoomUser[];
+  videoUrl?: string;
 }
 
 export interface RoomUser {
