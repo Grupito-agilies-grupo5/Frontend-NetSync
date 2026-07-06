@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ContentCard } from '../components/home/ContentCard';
-import { contentCatalog } from '../data/content';
 import { api } from '../services/api';
 import { ContentItem } from '../types';
 import { Copy, Check, ArrowRight, Loader2, Film } from 'lucide-react';
@@ -21,6 +20,7 @@ export const CreateRoomPage: React.FC = () => {
   const preselectedId = locState?.contentId || '';
   const fmdbMovie = locState?.fmdbMovie as FmdbMovieState | undefined;
 
+  const [catalog, setCatalog] = useState<ContentItem[]>([]);
   const [selectedContent, setSelectedContent] = useState<ContentItem | null>(
     fmdbMovie
       ? {
@@ -36,7 +36,7 @@ export const CreateRoomPage: React.FC = () => {
           posterUrl: fmdbMovie.posterUrl,
           actors: fmdbMovie.actors,
         }
-      : contentCatalog.find((c) => c.id === preselectedId) || null
+      : null
   );
   const [hostName, setHostName] = useState('');
   const [roomCode, setRoomCode] = useState('');
@@ -46,6 +46,17 @@ export const CreateRoomPage: React.FC = () => {
   const [copied, setCopied] = useState(false);
 
   const isFmdbContent = selectedContent?.id.startsWith('fmdb-');
+
+  useEffect(() => {
+    api.getContent().then((data) => {
+      setCatalog(data);
+      if (!fmdbMovie && preselectedId) {
+        const found = data.find((c) => c.id === preselectedId);
+        if (found) setSelectedContent(found);
+      }
+    }).catch(() => setCatalog([]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCreate = async () => {
     if (!selectedContent) {
@@ -132,7 +143,7 @@ export const CreateRoomPage: React.FC = () => {
             <div className="mb-8">
               <h2 className="text-lg font-semibold mb-4">1. Elige el contenido</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {contentCatalog.map((content) => (
+                {catalog.map((content) => (
                   <ContentCard
                     key={content.id}
                     content={content}

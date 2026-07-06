@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { HeroSection } from '../components/home/HeroSection';
 import { ContentCard } from '../components/home/ContentCard';
 import { MovieSearch } from '../components/home/MovieSearch';
-import { contentCatalog } from '../data/content';
+import { api } from '../services/api';
+import { ContentItem } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { AiAssistant } from '../components/dashboard/AiAssistant';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
+  const [contentCatalog, setContentCatalog] = useState<ContentItem[]>([]);
+
+  useEffect(() => {
+    api.getContent().then(setContentCatalog).catch(() => setContentCatalog([]));
+  }, []);
 
   return (
     <div>
